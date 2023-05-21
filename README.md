@@ -6,7 +6,9 @@ Caso ocorra o seguinte erro:
 
 Execute o seguinte comando em seu terminal:
 
-    openssl req -new -x509 -days 365 -nodes -out cert.pem -keyout key.pem -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost"
+    openssl req -new -x509 -days 365 -nodes -out cert.pem -keyout key.pem -subj "/C=BR/ST=Parana/L=Curitiba/O=Organization/CN=localhost"
+
+Mudar CN para usar em dois computadores, para gerar novos certificados, C, ST, L e O devem estar iguais na linha a cima e em `certificado.py`!
 
 * Para usar o sistema, execute:
 

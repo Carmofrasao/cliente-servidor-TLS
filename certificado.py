@@ -13,11 +13,11 @@ private_key = rsa.generate_private_key(
 
 # Criando um certificado autoassinado
 subject = issuer = x509.Name([
-    x509.NameAttribute(x509.NameOID.COUNTRY_NAME, 'US'),
-    x509.NameAttribute(x509.NameOID.STATE_OR_PROVINCE_NAME, 'California'),
-    x509.NameAttribute(x509.NameOID.LOCALITY_NAME, 'San Francisco'),
-    x509.NameAttribute(x509.NameOID.ORGANIZATION_NAME, 'Example Inc.'),
-    x509.NameAttribute(x509.NameOID.COMMON_NAME, 'example.com')
+    x509.NameAttribute(x509.NameOID.COUNTRY_NAME, 'BR'),
+    x509.NameAttribute(x509.NameOID.STATE_OR_PROVINCE_NAME, 'Parana'),
+    x509.NameAttribute(x509.NameOID.LOCALITY_NAME, 'Curitiba'),
+    x509.NameAttribute(x509.NameOID.ORGANIZATION_NAME, 'Organization Inc.'),
+    x509.NameAttribute(x509.NameOID.COMMON_NAME, 'Organization.com')
 ])
 
 cert_builder = x509.CertificateBuilder().subject_name(subject).issuer_name(issuer)
@@ -26,7 +26,7 @@ cert_builder = cert_builder.not_valid_after(datetime.datetime.utcnow() + datetim
 cert_builder = cert_builder.serial_number(x509.random_serial_number())
 cert_builder = cert_builder.public_key(private_key.public_key())
 cert_builder = cert_builder.add_extension(
-    x509.SubjectAlternativeName([x509.DNSName('example.com')]),
+    x509.SubjectAlternativeName([x509.DNSName('Organization.com')]),
     critical=False
 )
 
