@@ -8,13 +8,9 @@ def process_request(request):
 
     comm = args[0]
     if comm not in dir(KeyValueStore):
-        return False 
+        return f"'{comm}' não foi interpretado pelo server" 
 
     foo = getattr(database, comm)
-
-    # if(len(args) == 1):
-    #     return str(foo())
-
     return str(foo(*args[1:]))
 
 # Configurações do servidor

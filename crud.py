@@ -1,12 +1,13 @@
+import ast
 import pickle
 import functools
 
 def evaluate_arguments(func):
     @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
-        args = [eval(arg) if isinstance(arg, str) else arg for arg in args]
+        args = [ast.literal_eval(arg) if isinstance(arg, str) and arg.isnumeric() else arg for arg in args]
         kwargs = {key: eval(value) if isinstance(value, str) else value for key, value in kwargs.items()}
-        return func(self, *args, **kwargs)
+        return str(func(self, *args, **kwargs))
     return wrapper
 
 
@@ -36,7 +37,7 @@ class KeyValueStore:
     def create(self, key, value):
         """Adiciona `key` : `value` ao BD se `key` nao existe."""
         if key in self.data:
-            return f"Key {key} Já existe!"
+            return f"Chave {key} Já existe!"
         self.data[key] = value
         self._save_data()
 

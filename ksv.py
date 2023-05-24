@@ -1,6 +1,7 @@
 import cmd
 import ssl
 import socket
+from crud import KeyValueStore as kvs
 
 class KeyValueStoreShell(cmd.Cmd):
     intro = "Bem-vindo ao shell do Key-Value Store. Digite 'help' para listar os comandos disponíveis."
@@ -37,15 +38,22 @@ class KeyValueStoreShell(cmd.Cmd):
 
         return response
 
+    def _warn(self, msg):
+        if("None" == msg or msg == None):
+            print("Ok")
+        else:
+            print(msg)
+
     def do_create(self, arg):
         """Cria um novo par chave-valor. Sintaxe: create <chave> <valor>"""
         args = arg.split()
         if len(args) != 2:
             print("Comando inválido. Uso: create <chave> <valor>")
             return
-        # chave, valor = args
+        chave, valor = args
         # self.kvs.create(eval(chave), eval(valor))
-        self._send_query(arg)
+        resp = self._send_query(f"{kvs.create.__name__} {chave} {valor}")
+        self._warn(resp)
 
     def do_read(self, arg):
         """Lê o valor de uma chave. Sintaxe: read <chave>"""
@@ -54,7 +62,7 @@ class KeyValueStoreShell(cmd.Cmd):
             print("Comando inválido. Uso: read <chave>")
             return
         # valor = self.kvs.read(eval(chave))
-        valor = self._send_query(arg)
+        valor = self._send_query(f'{kvs.read.__name__} {chave}')
         print(valor)
 
     def do_update(self, arg):
@@ -63,9 +71,10 @@ class KeyValueStoreShell(cmd.Cmd):
         if len(args) != 2:
             print("Comando inválido. Uso: update <chave> <valor>")
             return
-        # chave, valor = args
+        chave, valor = args
         # self.kvs.update(eval(chave), eval(valor))
-        self._send_query(arg)
+        resp = self._send_query(f'{kvs.update.__name__} {chave} {valor}')
+        self._warn(resp)
 
     def do_delete(self, arg):
         """Exclui um par chave-valor. Sintaxe: delete <chave>"""
@@ -73,29 +82,27 @@ class KeyValueStoreShell(cmd.Cmd):
         if len(args) != 1:
             print("Comando inválido. Uso: delete <chave>")
             return
-        # chave = args[0]
+        chave = args[0]
         # self.kvs.delete(eval(chave))
-        self._send_query(arg)
+        resp = self._send_query(f'{kvs.delete.__name__} {chave}')
+        self._warn(resp)
 
 
     def do_keys(self, arg):
         """Obtém todas as chaves do Key-Value Store. Sintaxe: keys"""
         # chaves = self.kvs.get_all_keys()
-        chaves = self._send_query(arg)
-
+        chaves = self._send_query(kvs.get_all_keys.__name__)
         print(chaves)
 
     def do_values(self, arg):
         """Obtém todos os valores do Key-Value Store. Sintaxe: values"""
         # valores = self.kvs.get_all_values()
-        valores = self._send_query(arg)
-
+        valores = self._send_query(kvs.get_all_values.__name__)
         print(valores)
 
     def do_show(self, arg):
         """Mostra toda a Key-Value Store. Sintaxe: show"""
-        print(arg)
-        data = self._send_query(arg)
+        data = self._send_query(kvs.show.__name__)
         print(data)
 
     def do_exit(self, arg):
