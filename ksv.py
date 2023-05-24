@@ -81,20 +81,21 @@ class KeyValueStoreShell(cmd.Cmd):
     def do_keys(self, arg):
         """Obtém todas as chaves do Key-Value Store. Sintaxe: keys"""
         # chaves = self.kvs.get_all_keys()
-        chaves = self._send_query(kvs.get_all_keys.__name__)
+        chaves = self._send_query(arg)
 
         print(chaves)
 
     def do_values(self, arg):
         """Obtém todos os valores do Key-Value Store. Sintaxe: values"""
         # valores = self.kvs.get_all_values()
-        valores = self._send_query(kvs.get_all_values.__name__)
+        valores = self._send_query(arg)
 
         print(valores)
 
     def do_show(self, arg):
         """Mostra toda a Key-Value Store. Sintaxe: show"""
-        data = self._send_query(kvs.show.__name__)
+        print(arg)
+        data = self._send_query(arg)
         print(data)
 
     def do_exit(self, arg):
