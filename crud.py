@@ -5,7 +5,7 @@ import functools
 def evaluate_arguments(func):
     @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
-        args = [ast.literal_eval(arg) if isinstance(arg, str) and arg.isnumeric() else arg for arg in args]
+        args = [eval(arg) for arg in args]
         kwargs = {key: eval(value) if isinstance(value, str) else value for key, value in kwargs.items()}
         return str(func(self, *args, **kwargs))
     return wrapper

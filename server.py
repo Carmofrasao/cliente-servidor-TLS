@@ -11,7 +11,12 @@ def process_request(request):
         return f"'{comm}' não foi interpretado pelo server" 
 
     foo = getattr(database, comm)
-    return str(foo(*args[1:]))
+    try:
+        resp = str(foo(*args[1:]))
+    except Exception as e:
+        resp = f'Error while evaluating - {request} :\n{str(e)}'
+
+    return resp
 
 # Configurações do servidor
 HOST = 'localhost'
