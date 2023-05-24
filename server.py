@@ -52,14 +52,14 @@ server_socket.bind((HOST, PORT))
 server_socket.listen(1)
 print('Aguardando conexões...')
 
+# Aceita uma nova conexão
+client_socket, client_address = server_socket.accept()
+print('Conexão estabelecida com', client_address)
+
+# Configura a conexão para usar TLS
+secure_socket = context.wrap_socket(client_socket, server_side=True)
+
 while True:
-    # Aceita uma nova conexão
-    client_socket, client_address = server_socket.accept()
-    print('Conexão estabelecida com', client_address)
-
-    # Configura a conexão para usar TLS
-    secure_socket = context.wrap_socket(client_socket, server_side=True)
-
     # Recebe a requisição do cliente
     request = secure_socket.recv(1024).decode()
 
@@ -69,6 +69,6 @@ while True:
     # Envia a resposta ao cliente
     secure_socket.sendall(response.encode())
 
-    # Encerra a conexão com o cliente
-    secure_socket.shutdown(socket.SHUT_RDWR)
-    secure_socket.close()
+# Encerra a conexão com o cliente
+secure_socket.shutdown(socket.SHUT_RDWR)
+secure_socket.close()

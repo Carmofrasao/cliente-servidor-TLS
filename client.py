@@ -5,18 +5,18 @@ import ssl
 HOST = 'localhost'
 PORT = 8888
 
-while True:
-    # Cria um socket TCP
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    
-    # Configura o socket para usar TLS
-    context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
-    context.load_verify_locations('cert.pem')
+# Cria um socket TCP
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    # Estabelece a conexão segura com o servidor
-    secure_socket = context.wrap_socket(client_socket, server_hostname=HOST)
-    secure_socket.connect((HOST, PORT))
-    
+# Configura o socket para usar TLS
+context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+context.load_verify_locations('cert.pem')
+
+# Estabelece a conexão segura com o servidor
+secure_socket = context.wrap_socket(client_socket, server_hostname=HOST)
+secure_socket.connect((HOST, PORT))
+
+while True:
     # Solicita uma ação ao usuário
     action = input('Digite "GET chave" para obter um valor ou "SET chave valor" para definir um valor: ')
 
@@ -29,6 +29,6 @@ while True:
     # Imprime a resposta
     print('Resposta do servidor:', response)
 
-    # Encerra a conexão com o servidor
-    secure_socket.shutdown(socket.SHUT_RDWR)
-    secure_socket.close()
+# Encerra a conexão com o servidor
+secure_socket.shutdown(socket.SHUT_RDWR)
+secure_socket.close()
