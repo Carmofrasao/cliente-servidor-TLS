@@ -1,33 +1,21 @@
 import socket
 import ssl
 import json
-
-def load_database():
-    try:
-        with open('database.json', 'r') as file:
-            return json.load(file)
-    except FileNotFoundError:
-        return {}
-    
-def save_database(database):
-    with open('database.json', 'w') as file:
-        json.dump(database, file)
+from crud import KeyValueStore
 
 def process_request(request):
-    command, *args = request.split()
-    if command == 'GET':
-        # Obtém o valor associado à chave especificada pelo cliente
-        key = args[0]
-        value = database.get(key, f'A chave "{key}" não existe')
-        return value
-    
-    elif command == 'SET':
-        key, value = args
-        database[key] = value
-        save_database(database)
-        return 'OK'
-    else:
-        return 'Comando inválido'
+    args = request.split()
+
+    comm = args[0]
+    if comm not in dir(KeyValueStore):
+        return False 
+
+    foo = getattr(database, comm)
+
+    # if(len(args) == 1):
+    #     return str(foo())
+
+    return str(foo(*args[1:]))
 
 # Configurações do servidor
 HOST = 'localhost'
@@ -36,7 +24,7 @@ CERTFILE = 'cert.pem'  # Certificado do servidor
 KEYFILE = 'key.pem'    # Chave privada do servidor
 
 # Carrega o banco de dados a partir do arquivo
-database = load_database()
+database = KeyValueStore('database.pkl')
 
 # Cria um socket TCP
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

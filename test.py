@@ -16,3 +16,8 @@ for i in range(10):
     bd.create(1, 2) # Key '1' Já existe!
 
 print(bd.data)
+
+#
+# (KVS) command   -----> server  <-------> CRUD 
+# > output        <-------/
+#
