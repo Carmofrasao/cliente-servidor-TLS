@@ -1,38 +1,37 @@
-import socket
 import ssl
-import json
+import socket
 from crud import KeyValueStore
-
-def process_request(request):
-    args = request.split()
-
-    comm = args[0]
-    if comm not in dir(KeyValueStore):
-        return f"'{comm}' não foi interpretado pelo server" 
-
-    foo = getattr(database, comm)
-    try:
-        resp = str(foo(*args[1:]))
-    except Exception as e:
-        resp = f'Error while evaluating - {request} :\n{str(e)}'
-
-    return resp
 
 # Configurações do servidor
 HOST = 'localhost'
 PORT = 8888
-CERTFILE = 'cert.pem'  # Certificado do servidor
-KEYFILE = 'key.pem'    # Chave privada do servidor
 
 # Carrega o banco de dados a partir do arquivo
 database = KeyValueStore('database.pkl')
+
+def process_request(request):
+    args = request.split()
+    comm = args[0]
+    
+    if comm not in dir(KeyValueStore):
+        return f"'{comm}' não foi interpretado pelo server" 
+
+    foo = getattr(database, comm)
+
+    try:
+        resp = str(foo(*args[1:]))
+    except Exception as e:
+        resp = f'Não entendi o comando - "{request}"\nErro: {str(e)}'
+
+    return resp
+
 
 # Cria um socket TCP
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Configura o socket para aceitar conexões seguras
 context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-context.load_cert_chain(certfile=CERTFILE, keyfile=KEYFILE)
+context.load_cert_chain(certfile='certificado/cert.pem', keyfile='certificado/key.pem')
 
 # Associa o socket ao host e porta especificados
 server_socket.bind((HOST, PORT))
@@ -50,7 +49,12 @@ secure_socket = context.wrap_socket(client_socket, server_side=True)
 
 while True:
     # Recebe a requisição do cliente
-    request = secure_socket.recv(1024).decode()
+    ciphered = secure_socket.recv(1024)
+    request = ciphered.decode()
+
+    print('cifrado: ', ciphered)
+    print('claro  : ', request)
+    if request == 'exit': break
 
     # Processa a requisição
     response = process_request(request)
