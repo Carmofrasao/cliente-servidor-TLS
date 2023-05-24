@@ -26,7 +26,7 @@ class KeyValueStore:
     def create(self, key, value):
         """Adiciona `key` : `value` ao BD se `key` nao existe."""
         if key in self.data:
-            print(f"Key '{key}' Já existe!") if self.verbose else 0
+            print(f"Key {key} Já existe!") if self.verbose else 0
             return
         self.data[key] = value
         self._save_data()
@@ -38,7 +38,7 @@ class KeyValueStore:
     def update(self, key, value):
         """Atualiza `key` com `value` no BD se `key` existe."""
         if key not in self.data:
-            print(f"Key '{key}' does not exist.") if self.verbose else 0
+            print(f"Chave {key} não exite.") if self.verbose else 0
             return 
         self.data[key] = value
         self._save_data()
@@ -46,7 +46,7 @@ class KeyValueStore:
     def delete(self, key):
         """Deleta o par `{key: value}` se `key` existe."""
         if key not in self.data:
-            print(f"Key '{key}' does not exist.") if self.verbose else 0
+            print(f"Chave {key} não existe.") if self.verbose else 0
             return
         del self.data[key]
         self._save_data()
