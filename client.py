@@ -102,6 +102,16 @@ class KeyValueStoreShell(cmd.Cmd):
         data = self._send_query(kvs.show.__name__)
         print(data)
 
+    def do_help(self, arg):
+        """Mostra comandos disponíveis e como usá-los."""
+        command_names = [cmd_name[3:] for cmd_name in dir(self) if cmd_name.startswith('do_')]
+        command_usage = [getattr(self, f"do_{cmd_name}").__doc__ for cmd_name in command_names]
+        
+        print("\nComandos disponíveis:")
+        for name, usage in zip(command_names, command_usage):
+            print(f"  {name}{' '*(10-len(name))}: {usage}")
+        print()
+
     def do_exit(self, arg):
         """Sai do shell. Sintaxe: exit"""
         self._send_query('exit')
