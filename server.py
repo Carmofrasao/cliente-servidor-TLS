@@ -1,10 +1,14 @@
 import ssl
 import socket
 from crud import KeyValueStore
+# import pyshark
 
 # Configurações do servidor
 HOST = 'localhost'
 PORT = 8888
+
+# iface_name = 'lo'
+# filter_string = 'port 8888'
 
 # Carrega o banco de dados a partir do arquivo
 database = KeyValueStore('database.pkl')
@@ -53,6 +57,15 @@ while True:
     request = ciphered.decode()
 
     print('cifrado: ', ciphered)
+    # capture = pyshark.LiveCapture(
+    #     interface=iface_name,
+    #     bpf_filter=filter_string
+    # )
+    # capture.sniff(timeout=5, packet_count=5)
+    # print(capture)
+    # if len(capture) > 0:
+    #     for packet in capture:
+    #         print('source: ' + packet.ip.src)
     print('claro  : ', request)
     if request == 'exit': break
 
