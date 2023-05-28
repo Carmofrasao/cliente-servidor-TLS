@@ -8,8 +8,6 @@ HOST = 'localhost'
 PORT = 8888
 
 iface_name = 'lo'
-filter_string = 'port 8888'
-
 
 capture = pyshark.LiveCapture(
     interface=iface_name,
@@ -57,11 +55,24 @@ print('Conexão estabelecida com', client_address)
 secure_socket = context.wrap_socket(client_socket, server_side=True)
 
 while True:
+    # Scan (basicamente wireshark)
     capture.sniff(timeout=0.5)
+
+    # Iterando sobre os pacotes interceptados
     for packet in capture:
+        # Só imprime se for um pacote com tls
         if packet.highest_layer == 'TLS':
+            # Tratando o pacote como string
+            # Originalmente é um XML
             string = str(packet.tls)
+            
+            # Tem varias informações no pacote
+            # Mas só queremos os dados 
+            # Após split, os dados estão na posição 7
+            # Ao final da string de dados tem um \n que não queremos
             print('cifrado :', string.split(':')[7][:-1])
+            
+            # Só precisamos do primeiro pacote TLS
             break
     
     # Recebe a requisição do cliente
