@@ -57,18 +57,18 @@ print('Conexão estabelecida com', client_address)
 secure_socket = context.wrap_socket(client_socket, server_side=True)
 
 while True:
-    capture.sniff(timeout=1)
+    capture.sniff(timeout=0.5)
     for packet in capture:
         if packet.highest_layer == 'TLS':
-            print(packet)
-            print('-------------------------------------------------')
-    print('passou o scan')
+            string = str(packet.tls)
+            print('cifrado :', string.split(':')[7][:-1])
+            break
+    
     # Recebe a requisição do cliente
     ciphered = secure_socket.recv(1024)
     request = ciphered.decode()
 
-    # print('cifrado: ', ciphered)
-    print('claro  : ', request)
+    print('claro   : ', request)
     
     if request == 'exit': break
 
