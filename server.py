@@ -70,7 +70,8 @@ while True:
             # Mas só queremos os dados 
             # Após split, os dados estão na posição 7
             # Ao final da string de dados tem um \n que não queremos
-            print(f'cifrado : {string}')
+            print('\nMensagem recebida')
+            print(f'Cifrada : {string}')
             
             # Só precisamos do primeiro pacote TLS
             break
@@ -79,7 +80,7 @@ while True:
     ciphered = secure_socket.recv(1024)
     request = ciphered.decode()
 
-    print(f'claro   : {request}')
+    print(f'Clara   : {request}\n')
     
     if request == 'exit': break
 
