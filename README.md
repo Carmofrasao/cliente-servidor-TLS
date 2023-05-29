@@ -1,19 +1,15 @@
 # Cliente Servidor TLS
 
-Caso ocorra o seguinte erro:
-
-    ValueError: Cannot set verify_mode to CERT_NONE when check_hostname is enabled
-
-Execute o seguinte comando em seu terminal:
+Execute o seguinte comando em seu terminal para gerar novos certificados:
 
     openssl req -new -x509 -days 365 -nodes -out cert.pem -keyout key.pem -subj "/C=BR/ST=Parana/L=Curitiba/O=Organization/CN=localhost"
 
-Mudar CN para usar em dois computadores, para gerar novos certificados, C, ST, L e O devem estar iguais na linha a cima e em `certificado.py`!
+Mudar CN para usar em dois computadores, para gerar novos certificados, C, ST, L e O devem estar iguais na linha a cima!
 
 - Para usar o sistema, execute em ordem:
 
 ```shell
-python3 server.py
+sudo python3 server.py
 python3 client.py
 ```
 
