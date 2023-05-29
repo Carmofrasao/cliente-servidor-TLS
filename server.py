@@ -64,13 +64,13 @@ while True:
         if packet.highest_layer == 'TLS':
             # Tratando o pacote como string
             # Originalmente é um XML
-            string = str(packet.tls)
+            string = packet.tls.app_data.replace(':', '')
             
             # Tem varias informações no pacote
             # Mas só queremos os dados 
             # Após split, os dados estão na posição 7
             # Ao final da string de dados tem um \n que não queremos
-            print('cifrado :', string.split(':')[7][:-1])
+            print(f'cifrado : {string}')
             
             # Só precisamos do primeiro pacote TLS
             break
@@ -79,7 +79,7 @@ while True:
     ciphered = secure_socket.recv(1024)
     request = ciphered.decode()
 
-    print('claro   : ', request)
+    print(f'claro   : {request}')
     
     if request == 'exit': break
 
