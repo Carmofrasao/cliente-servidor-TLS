@@ -2,6 +2,7 @@ import cmd
 import ssl
 import socket
 from crud import KeyValueStore as kvs
+import pyshark
 
 class KeyValueStoreShell(cmd.Cmd):
     intro = "Bem-vindo ao shell do Key-Value Store. Digite 'help' para listar os comandos disponíveis."
@@ -31,6 +32,29 @@ class KeyValueStoreShell(cmd.Cmd):
     def _send_query(self, query):
         # Envia a requisição ao servidor
         self.secure_socket.sendall(query.encode())
+
+        iface_name = 'lo'
+
+        capture = pyshark.LiveCapture(
+            interface=iface_name,
+        )
+
+        if query != 'exit':
+            # Scan (basicamente wireshark)
+            capture.sniff(timeout=0.5)
+
+            # Iterando sobre os pacotes interceptados
+            for packet in capture:
+                # Só imprime se for um pacote com tls
+                if packet.highest_layer == 'TLS':
+                    # Encontrando os dados no pacote
+                    string = packet.tls.app_data.replace(':', '')
+                    
+                    print('\nMensagem enviada original')
+                    print(f'Cifrada : {string}\n')
+                    
+                    # Só precisamos do primeiro pacote TLS
+                    break
 
         # Recebe a resposta do servidor
         return self.secure_socket.recv(1024).decode()

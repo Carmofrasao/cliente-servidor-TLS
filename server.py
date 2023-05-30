@@ -62,14 +62,9 @@ while True:
     for packet in capture:
         # Só imprime se for um pacote com tls
         if packet.highest_layer == 'TLS':
-            # Tratando o pacote como string
-            # Originalmente é um XML
+            # Encontrando os dados no pacote
             string = packet.tls.app_data.replace(':', '')
             
-            # Tem varias informações no pacote
-            # Mas só queremos os dados 
-            # Após split, os dados estão na posição 7
-            # Ao final da string de dados tem um \n que não queremos
             print('\nMensagem recebida')
             print(f'Cifrada : {string}')
             
