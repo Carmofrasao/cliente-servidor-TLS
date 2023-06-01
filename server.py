@@ -106,9 +106,10 @@ class ServerAtacavel(ServerKVS):
 
 
 if __name__ == '__main__':
-    allow_editing = "--edit" or "--show" in sys.argv
+    allow_editing = "--edit" in sys.argv
+    show_ciphered = "--show" in sys.argv
 
-    if(allow_editing):
+    if(allow_editing or show_ciphered):
         ServerAtacavel().run()
     else:
         ServerKVS().run()
