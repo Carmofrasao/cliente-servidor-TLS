@@ -1,3 +1,8 @@
+# Autores
+# Eduardo Gobbo W.V.G. 
+# Anderson Aparecido do Carmo Frasão
+# Ultima alteração 01/06/2023 - 9h47m
+
 import cmd
 import pickle
 import functools
@@ -79,7 +84,7 @@ class KeyValueStore:
 
 
 # shorthand for class bellow
-#define kvs KeyValueStore
+# define kvs KeyValueStore
 kvs = KeyValueStore
 
 class KeyValueStoreShell(cmd.Cmd):
@@ -113,7 +118,6 @@ class KeyValueStoreShell(cmd.Cmd):
             print("Comando inválido. Uso: create <chave> <valor>")
             return
         chave, valor = args
-        # self.kvs.create(eval(chave), eval(valor))
         resp = self._send_query(f"{kvs.create.__name__} {chave} {valor}")
         self._warn(resp)
 
@@ -134,7 +138,6 @@ class KeyValueStoreShell(cmd.Cmd):
             print("Comando inválido. Uso: update <chave> <valor>")
             return
         chave, valor = args
-        # self.kvs.update(eval(chave), eval(valor))
         resp = self._send_query(f'{kvs.update.__name__} {chave} {valor}')
         self._warn(resp)
 
@@ -145,14 +148,12 @@ class KeyValueStoreShell(cmd.Cmd):
             print("Comando inválido. Uso: delete <chave>")
             return
         chave = args[0]
-        # self.kvs.delete(eval(chave))
         resp = self._send_query(f'{kvs.delete.__name__} {chave}')
         self._warn(resp)
 
 
     def do_keys(self, arg):
         """Obtém todas as chaves do Key-Value Store. Sintaxe: keys"""
-        # chaves = self.kvs.get_all_keys()
         chaves = self._send_query(kvs.get_all_keys.__name__)
         print(chaves)
 
