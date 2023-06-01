@@ -2,3 +2,4 @@ __pycache__/
 database.pkl
 database.json
 test.py
+_*

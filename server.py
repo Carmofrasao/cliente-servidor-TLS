@@ -1,90 +1,114 @@
+# Autores
+# Eduardo Gobbo W.V.G. 
+# Anderson Aparecido do Carmo Frasão
+# Ultima alteração 31/05/2023 - 22h56m
+
+# Testes:
+# 1. Autenticação   - comentar a linha de `context.wrap_socket` em Server.create_socket
+# 2. Sigilo         - executando server ou client basta executar com `--show`
+# 3. Integridade    - executando client com `--edit` é possível editar um byte (endereço maior que 10)
+#                     podemos ver que o server tem erro ao descriptografar a mensagem.  
+
+from socket import create_server, SHUT_RDWR
 import ssl
-import socket
-from crud import KeyValueStore
-import pyshark
+import sys
 
-# Configurações do servidor
-HOST = 'localhost'
-PORT = 8888
-
-iface_name = 'lo'
-
-capture = pyshark.LiveCapture(
-    interface=iface_name,
-)
-
-# Carrega o banco de dados a partir do arquivo
-database = KeyValueStore('database.pkl')
-
-def process_request(request):
-    args = request.split()
-    comm = args[0]
-    
-    if comm not in dir(KeyValueStore):
-        return f"'{comm}' não foi interpretado pelo server" 
-
-    foo = getattr(database, comm)
-
-    try:
-        resp = str(foo(*args[1:]))
-    except Exception as e:
-        resp = f'Não entendi o comando - "{request}"\nErro: {str(e)}'
-
-    return resp
+from config import PORT, CERT_FILE, PKEY_FILE
+from inspectable import InspectableListenerSocket
+from key_value_store import KeyValueStore
 
 
-# Cria um socket TCP
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+class Server:
+    def __init__(self):
+        self.listener_socket = None
+        self.client_socket = None
+        self.client_address = None
 
-# Configura o socket para aceitar conexões seguras
-context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-context.load_cert_chain(certfile='certificado/cert.pem', keyfile='certificado/key.pem')
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context.load_cert_chain(CERT_FILE, PKEY_FILE)
+        self.context = context
 
-# Associa o socket ao host e porta especificados
-server_socket.bind((HOST, PORT))
+    def run(self):
+        self.listener_socket = self.create_socket()
+        print('Aguardando conexões...')
 
-# Inicia a escuta por conexões
-server_socket.listen(1)
-print('Aguardando conexões...')
-
-# Aceita uma nova conexão
-client_socket, client_address = server_socket.accept()
-print('Conexão estabelecida com', client_address)
-
-# Configura a conexão para usar TLS
-secure_socket = context.wrap_socket(client_socket, server_side=True)
-
-while True:
-    # Scan (basicamente wireshark)
-    capture.sniff(timeout=0.5)
-
-    # Iterando sobre os pacotes interceptados
-    for packet in capture:
-        # Só imprime se for um pacote com tls
-        if packet.highest_layer == 'TLS':
-            # Encontrando os dados no pacote
-            string = packet.tls.app_data.replace(':', '')
+        try:
+            self.client_socket, self.client_address = self.listener_socket.accept()
+            print('Conexão estabelecida com', self.client_address)
             
-            print('\nMensagem recebida')
-            print(f'Cifrada : {string}')
+            self.handle_client()
+        except ssl.SSLEOFError:
+            # When a handshake is unexpectedly closed, we ignore
+            print("Client didn't finish handshake")
+
+        self.listener_socket.close()
+
+    def create_simple_socket(self):
+        return create_server(("", PORT))
+
+    def create_socket(self):
+        socket = self.create_simple_socket()
+        return self.context.wrap_socket(socket, server_side=True)
+
+    def handle_client(self):
+        # herdar classe e implementar lógica nesta função
+        # self.client_socket.send(msg.encode())
+        # self.client_socket.recv(1024).decode()
+        pass
+
+
+
+class ServerKVS(Server):
+    def __init__(self):
+        super().__init__()
+
+        self.database = KeyValueStore('database.pkl')
+
+    def handle_client(self):
+        while True:
             
-            # Só precisamos do primeiro pacote TLS
-            break
-    
-    # Recebe a requisição do cliente
-    ciphered = secure_socket.recv(1024)
-    request = ciphered.decode()
+            # Recebe a requisição do cliente
+            request = self.client_socket.recv(1024).decode()
+            
+            if request == 'exit': break
 
-    print(f'Clara   : {request}\n')
-    
-    if request == 'exit': break
+            # Processa a requisição
+            response = self.process_request(request)
 
-    # Processa a requisição
-    response = process_request(request)
+            # Envia a resposta ao cliente
+            self.client_socket.send(response.encode())
 
-    # Envia a resposta ao cliente
-    secure_socket.sendall(response.encode())
+        # Encerra a conexão com o cliente
+        self.listener_socket.shutdown(SHUT_RDWR)
+        self.listener_socket.close()
 
-# Encerra a conexão com o cliente
-secure_socket.shutdown(socket.SHUT_RDWR)
-secure_socket.close()
+    def process_request(self, request):
+        args = request.split()
+        comm = args[0]
+        
+        if comm not in dir(KeyValueStore):
+            return f"'{comm}' não foi interpretado pelo server" 
+
+        foo = getattr(self.database, comm)
+
+        try:
+            resp = str(foo(*args[1:]))
+        except Exception as e:
+            resp = f'Não entendi o comando - "{request}"\nErro: {str(e)}'
+
+        return resp
+
+
+class ServerAtacavel(ServerKVS):
+    def create_socket(self):
+        socket = self.create_simple_socket()
+        return InspectableListenerSocket(socket, self.context, server_side=True)
+
+
+if __name__ == '__main__':
+    allow_editing = "--edit" or "--show" in sys.argv
+
+    if(allow_editing):
+        ServerAtacavel().run()
+    else:
+        ServerKVS().run()
