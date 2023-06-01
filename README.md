@@ -1,19 +1,21 @@
 # Cliente Servidor TLS
 
+## Certificados
+
 Execute o seguinte comando em seu terminal para gerar novos certificados:
 
     openssl req -new -x509 -days 365 -nodes -out cert.pem -keyout key.pem -subj "/C=BR/ST=Parana/L=Curitiba/O=Organization/CN=localhost"
 
 Mudar CN para usar em dois computadores, para gerar novos certificados, C, ST, L e O devem estar iguais na linha a cima!
 
-- Para usar o sistema, execute em ordem:
+## Uso
+
+- Para usar o sistema normalmente, basta executar em ordem:
 
 ```shell
-sudo python3 server.py
+python3 server.py
 python3 client.py
 ```
-
-# Uso
 
 - O cliente tem acesso a base de dados do server, para usar:
 
@@ -30,9 +32,35 @@ Comandos disponíveis:
   values    : Obtém todos os valores do Key-Value Store. Sintaxe: values
 ```
 
-### Testes:
+# Testes:
 
-1. Autenticação - comentar a linha de `context.wrap_socket` em `Server.create_socket`
-2. Sigilo - executando server ou client basta executar com `--show`
-3. Integridade - executando client com `--edit` é possível editar um byte (endereço maior que 10)
-   podemos ver que o server tem erro ao descriptografar a mensagem.
+## Autenticação
+
+Executando o cliente com a opção `client.py --noauth` podemos ver que utilizar um certificado desconhecido pelo servidor não permite a comunicação do cliente com o servidor.
+
+```shell
+python server.py
+python client.py --noauth
+```
+
+## Sigilo
+
+Para visualizar as mensagens abertas e cifradas basta executar ou o cliente ou o servicor com a opção `--show`
+
+```shell
+python server.py --show
+python client.py --show
+```
+
+## Integridade
+
+Para alterar um byte da mensagem e verificar que uma mensagem alterada não é descriptografada corretamente, execute:
+
+```shell
+python server.py
+python client.py --edit
+```
+
+Executando o cliente com `--edit` é possível editar um byte (escolha um endereço maior que 10).
+
+- Já o server pode receber `--show` ou `--edit` opcionalmente, apenas para ver as mensagens trafegando.

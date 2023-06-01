@@ -3,26 +3,24 @@
 # Anderson Aparecido do Carmo Frasão
 # Ultima alteração 31/05/2023 - 22h56m
 
-# Testes:
-# 1. Autenticação   - comentar a linha de `context.wrap_socket` em Server.create_socket
-# 2. Sigilo         - executando server ou client basta executar com `--show`
-# 3. Integridade    - executando client com `--edit` é possível editar um byte (endereço maior que 10)
-#                     podemos ver que o server tem erro ao descriptografar a mensagem.  
 
 from ssl import SSLContext, PROTOCOL_TLS_CLIENT
 from socket import create_connection
 import sys
 
-from config import HOSTNAME, SERVER_ADDRESS, CERT_FILE
+from config import HOSTNAME, SERVER_ADDRESS, CERT_FILE, FAKE_CERT
 from key_value_store import KeyValueStoreShell
 from inspectable import InspectableSocket
 
 class Client:
-    def __init__(self):
-        context = SSLContext(PROTOCOL_TLS_CLIENT)
-        context.load_verify_locations(CERT_FILE)
-        self.context = context
+    def __init__(self, authenticate=True):
         self.hostname = HOSTNAME
+        self.authenticate = authenticate
+        self.certificate = CERT_FILE if authenticate else FAKE_CERT
+
+        context = SSLContext(PROTOCOL_TLS_CLIENT)
+        context.load_verify_locations(self.certificate)
+        self.context = context
 
     def create_simple_socket(self):
         return create_connection(SERVER_ADDRESS)
@@ -62,9 +60,10 @@ class ClientAtacavel(ClientKVS):
 if __name__ == "__main__":
     allow_editing = "--edit" in sys.argv
     show_ciphered = "--show" in sys.argv
+    authenticate = "--noauth" not in sys.argv
 
     if(allow_editing or show_ciphered):
-        ClientAtacavel(allow_editing=allow_editing).run()
+        ClientAtacavel(authenticate, allow_editing).run()
     else:
-        ClientKVS().run()
+        ClientKVS(authenticate).run()
 
