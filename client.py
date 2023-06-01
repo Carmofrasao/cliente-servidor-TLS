@@ -63,7 +63,7 @@ if __name__ == "__main__":
     authenticate = "--noauth" not in sys.argv
 
     if(allow_editing or show_ciphered):
-        ClientAtacavel(authenticate, allow_editing).run()
+        ClientAtacavel(allow_editing).run()
     else:
         ClientKVS(authenticate).run()
 
