@@ -29,3 +29,10 @@ Comandos disponíveis:
   update    : Atualiza o valor de uma chave existente. Sintaxe: update <chave> <valor>
   values    : Obtém todos os valores do Key-Value Store. Sintaxe: values
 ```
+
+### Testes:
+
+1. Autenticação - comentar a linha de `context.wrap_socket` em `Server.create_socket`
+2. Sigilo - executando server ou client basta executar com `--show`
+3. Integridade - executando client com `--edit` é possível editar um byte (endereço maior que 10)
+   podemos ver que o server tem erro ao descriptografar a mensagem.
