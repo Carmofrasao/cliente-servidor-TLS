@@ -8,7 +8,7 @@ Execute o seguinte comando em seu terminal para gerar novos certificados:
 
 Mudar CN para usar em dois computadores, para gerar novos certificados, C, ST, L e O devem estar iguais na linha a cima!
 
-## Uso
+## Uso:
 
 - Para usar o sistema normalmente, basta executar em ordem:
 
@@ -64,3 +64,6 @@ python client.py --edit
 Executando o cliente com `--edit` é possível editar um byte (escolha um endereço maior que 10).
 
 - Já o server pode receber `--show` ou `--edit` opcionalmente, apenas para ver as mensagens trafegando.
+
+# Site:
+<https://gobbedu.github.io/Secure-KVS/>
